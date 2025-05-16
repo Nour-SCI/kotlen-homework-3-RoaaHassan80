@@ -1,22 +1,46 @@
-import kotlin.random.Random
-import utils.getStringRepresentation
+import org.junit.jupiter.api.Assertions.*
 
-fun <T : Comparable<T>> quickSort(items: List<T>): List<T> {
-    if (items.size < 2) {
-        return items
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
+
+
+internal class QuickSortTest {
+
+    companion object {
+        @JvmStatic
+        fun numbers() = listOf(
+            Arguments.of(
+                emptyList<Int>(),
+                emptyList<Int>(),
+            ),
+            Arguments.of(
+                listOf(1),
+                listOf(1),
+            ),
+            Arguments.of(
+                listOf(1, 2, 1),
+                listOf(1, 1, 2),
+            ),
+            Arguments.of(
+                listOf(95, 68, 37, 4, 79, 94, 38, 27, 57, 14),
+                listOf(4, 14, 27, 37, 38, 57, 68, 79, 94, 95),
+            )
+        )
     }
-    val pivot = items[items.size / 2]
-//    val equal = items.filter { it == pivot }
-    val less = items.filter { it < pivot }
-    val greater = items.filter { it > pivot }
-//    return quickSort(less) + equal + quickSort(greater)
-    return quickSort(less) + quickSort(greater)
-}
 
-fun main() {
-    println("Before quicksort:")
-    val numbers  = List(10) { Random.nextInt(0, 100) }
-    println(numbers.getStringRepresentation())
-    println("After quicksort:")
-    println(quickSort(numbers).getStringRepresentation())
+    @ParameterizedTest
+    @MethodSource("numbers")
+    fun quickSortImplTest(initialList: List<Int>, expectedList: List<Int>) {
+        assertEquals(expectedList, quickSort(initialList))
+    }
+
+    fun quickSort(list: List<Int>): List<Int> {
+        if (list.size <= 1) return list
+        val pivot = list[list.size / 2]
+        val lesser = list.filter { it < pivot }
+        val equal = list.filter { it == pivot }
+        val greater = list.filter { it > pivot }
+        return quickSort(lesser) + equal + quickSort(greater)
+    }
 }
